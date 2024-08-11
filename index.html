@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>BookMark</title>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#add-book">Add Book</a>
+        <a href="#your-books">Your Books</a>
+        <a href="#search">Search</a>
+    </nav>
+
+    <header class="title-section">
+        <h1 class="title">BookMark</h1>
+    </header>
+
+    <section id="add-book" class="form-section">
+        <h2>Add a New Book</h2>
+        <form action="/add" method="POST">
+            <input type="text" name="title" placeholder="Book Title" required>
+            <input type="text" name="author" placeholder="Author" required>
+            <select name="status" required>
+                <option value="read">Read</option>
+                <option value="wishlist">Wishlist</option>
+            </select>
+            <input type="number" name="pages_read" placeholder="Pages Read" min="0">
+            <input type="number" name="total_pages" placeholder="Total Pages" min="1" required>
+            <button type="submit">Add Book</button>
+        </form>
+    </section>
+
+    <section id="search" class="form-section">
+        <h2>Search for Books</h2>
+        <form action="/search" method="GET">
+            <input type="text" name="query" placeholder="Search for books..." required>
+            <button type="submit">Search</button>
+        </form>
+    </section>
+
+    <section id="sort-filter" class="form-section">
+        <h2>Sort and Filter Books</h2>
+        <form action="/" method="GET">
+            <label for="sort-by">Sort by:</label>
+            <select name="sort_by" id="sort-by">
+                <option value="title">Title</option>
+                <option value="author">Author</option>
+                <option value="status">Status</option>
+            </select>
+            <label for="filter-by">Filter by status:</label>
+            <select name="filter_by" id="filter-by">
+                <option value="">All</option>
+                <option value="read">Read</option>
+                <option value="wishlist">Wishlist</option>
+            </select>
+            <button type="submit">Apply</button>
+        </form>
+    </section>
+
+    <section id="your-books">
+        <h2>Your Books</h2>
+        <div>
+            {% for book in books %}
+                <div class="book {% if book['status'] == 'read' %}read{% else %}wishlist{% endif %}">
+                    <strong>{{ book['title'] }}</strong> by {{ book['author'] }} - <em>{{ book['status'] }}</em>
+                    <p>Progress: {{ book['pages_read'] }} / {{ book['total_pages'] }} pages</p>
+                    {% if book['total_pages'] > 0 %}
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: {{ (book['pages_read'] / book['total_pages']) * 100 }}%;"></div>
+                        </div>
+                    {% endif %}
+                    <a href="{{ url_for('edit_book', book_id=book['id']) }}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{{ url_for('delete_book', book_id=book['id']) }}" class="btn btn-danger btn-sm">Delete</a>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
